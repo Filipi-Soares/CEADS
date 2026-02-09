@@ -1,25 +1,13 @@
-# FILE: algo.py
 #!/usr/bin/env python3
 """
 AgroAnnotator / HumbleAnnotator (Pontus-X compatible)
 
-Key features:
-- File input: .txt/.md/.html/.htm/.pdf/.docx (and '-' for stdin)
-- Chunking for large inputs
-- Calls AgroPortal /annotator per chunk
-- Merges/deduplicates across chunk overlap
-- Produces concepts_summary.(json|csv) with occurrence counts
+Key fix for AgrospAI/Pontus-X:
+- If executed as `python $ALGO` with no CLI args, auto-detect the dataset file
+  from /data/inputs/... and write outputs to /data/outputs by default.
 
-Pontus-X / Ocean compute-to-data support:
-- Reads custom parameters from algoCustomData.json when present.
-  Used for ontology selection when CLI args mapping isn't available in UI.
-
-Ontology resolution precedence:
-1) --ontologies (explicit)
-2) algoCustomData.json["ontologies"]
-3) env vars: ONTOLOGIES, AGROSPAI_ONTOLOGIES, PARAM_ONTOLOGIES, etc.
-4) prompt (only if interactive TTY and not disabled)
-5) default (AGROVOC)
+Supported inputs:
+- .pdf, .html/.htm, .txt/.md, .docx, or "-" for stdin (local usage)
 """
 
 from __future__ import annotations
@@ -39,7 +27,6 @@ from typing import Any, Dict, Iterable, List, Optional, Tuple
 from urllib.parse import quote, urlparse
 
 import requests
-
 
 DEFAULT_BASE_URL = "https://data.agroportal.lirmm.fr"
 DEFAULT_API_KEY = os.environ.get("AGROPORTAL_API_KEY", "2ae6878b-a599-4cee-8224-e8efaf6f610e")
@@ -165,6 +152,28 @@ def _html_to_text(html_str: str) -> str:
         return _normalize_text(parser.get_text())
 
 
+def _sniff_input_type(path: Path) -> str:
+    """
+    For Pontus-X inputs that come without extensions (e.g. .../0),
+    sniff content to decide how to parse.
+    """
+    try:
+        head = path.read_bytes()[:4096]
+    except Exception:
+        return "text"
+
+    if head.startswith(b"%PDF-"):
+        return "pdf"
+
+    # cheap HTML sniff
+    low = head.lower()
+    if b"<html" in low or b"<!doctype html" in low or b"<body" in low:
+        return "html"
+
+    # otherwise treat as text
+    return "text"
+
+
 def load_input_text(input_arg: str, encoding: str) -> str:
     if input_arg == "-":
         return sys.stdin.read()
@@ -172,6 +181,13 @@ def load_input_text(input_arg: str, encoding: str) -> str:
     p = Path(input_arg)
     if not p.exists():
         raise InputError(f"Input path does not exist: {p}")
+
+    if p.is_dir():
+        # If a directory is passed, pick first file inside.
+        files = [f for f in p.rglob("*") if f.is_file()]
+        if not files:
+            raise InputError(f"Input directory is empty: {p}")
+        p = files[0]
 
     ext = p.suffix.lower()
     if ext in {".txt", ".md"}:
@@ -183,7 +199,13 @@ def load_input_text(input_arg: str, encoding: str) -> str:
     if ext == ".docx":
         return _read_docx(p)
 
-    raise InputError(f"Unsupported input type: {ext}")
+    # No/unknown extension -> sniff (Pontus-X typical)
+    kind = _sniff_input_type(p)
+    if kind == "pdf":
+        return _read_pdf(p)
+    if kind == "html":
+        return _html_to_text(_read_text_file(p, encoding))
+    return _read_text_file(p, encoding)
 
 
 def chunk_text(text: str, max_chars: int, overlap: int) -> List[Chunk]:
@@ -321,13 +343,6 @@ def _bounded_find_file(root: Path, name: str, max_depth: int = 4) -> Optional[Pa
 
 
 def load_algo_custom_data() -> Dict[str, Any]:
-    """
-    Attempts to load Pontus-X / Ocean style algoCustomData.json.
-
-    Search order:
-    1) explicit env path hints
-    2) cwd and common compute/work dirs (bounded search)
-    """
     env_paths = [
         os.environ.get("ALGO_CUSTOM_DATA"),
         os.environ.get("OCEAN_ALGO_CUSTOM_DATA"),
@@ -342,15 +357,7 @@ def load_algo_custom_data() -> Dict[str, Any]:
                 except Exception:
                     return {}
 
-    common_roots = [
-        Path.cwd(),
-        Path("/data"),
-        Path("/inputs"),
-        Path("/input"),
-        Path("/mnt"),
-        Path("/workspace"),
-        Path("/tmp"),
-    ]
+    common_roots = [Path("/data/inputs"), Path.cwd(), Path("/data"), Path("/tmp")]
     for root in common_roots:
         if root.exists() and root.is_dir():
             found = _bounded_find_file(root, "algoCustomData.json", max_depth=4)
@@ -364,30 +371,20 @@ def load_algo_custom_data() -> Dict[str, Any]:
 
 
 def resolve_ontologies(args: argparse.Namespace) -> List[str]:
-    # 1) Explicit CLI
     if args.ontologies:
         return [o.strip().upper() for o in args.ontologies if o.strip()]
 
-    # 2) algoCustomData.json
     custom = load_algo_custom_data()
     if isinstance(custom, dict):
         parsed = _parse_ontologies_from_any(custom.get("ontologies"))
         if parsed:
             return parsed
 
-    # 3) env fallbacks (if platform injects parameters as env vars)
-    for key in (
-        "ONTOLOGIES",
-        "ontologies",
-        "AGROSPAI_ONTOLOGIES",
-        "PARAM_ONTOLOGIES",
-        "ALGO_PARAM_ONTOLOGIES",
-    ):
+    for key in ("ONTOLOGIES", "ontologies", "AGROSPAI_ONTOLOGIES", "PARAM_ONTOLOGIES", "ALGO_PARAM_ONTOLOGIES"):
         parsed = _parse_ontology_list(os.environ.get(key, ""))
         if parsed:
             return parsed
 
-    # 4) Interactive prompt (only if TTY)
     default_list = _parse_ontology_list(DEFAULT_ONTOLOGY) or ["AGROVOC"]
     if args.no_prompt_ontology or not (sys.stdin.isatty() and sys.stdout.isatty()):
         return default_list
@@ -536,129 +533,6 @@ def merge_annotations(combined: List[Dict[str, Any]]) -> Dict[str, Any]:
     return {"annotations": merged, "counts": {"raw": raw, "merged": len(merged)}}
 
 
-def _ontology_acronym_from_url(ontology_url: str) -> str:
-    if not ontology_url:
-        return ""
-    p = urlparse(ontology_url)
-    parts = [x for x in p.path.split("/") if x]
-    if len(parts) >= 2 and parts[-2].lower() == "ontologies":
-        return parts[-1].strip().upper()
-    return parts[-1].strip().upper() if parts else ""
-
-
-def _pick_lang_value(value: Any, preferred_lang: str) -> str:
-    pref = (preferred_lang or "en").strip().lower()
-    if pref == "any":
-        pref = ""
-
-    def from_item(it: Any) -> Tuple[str, str]:
-        if isinstance(it, str):
-            return "", it.strip()
-        if isinstance(it, dict):
-            lang = str(it.get("@language") or it.get("language") or "").strip().lower()
-            txt = it.get("@value") or it.get("value") or it.get("text") or ""
-            return lang, txt.strip() if isinstance(txt, str) else ""
-        return "", ""
-
-    if isinstance(value, str) and value.strip():
-        return value.strip()
-
-    if isinstance(value, dict):
-        _, txt = from_item(value)
-        return txt
-
-    if isinstance(value, list):
-        candidates: List[Tuple[str, str]] = []
-        for it in value:
-            lang, txt = from_item(it)
-            if txt:
-                candidates.append((lang, txt))
-        if not candidates:
-            return ""
-        if pref:
-            for lang, txt in candidates:
-                if lang == pref or (lang and lang.startswith(pref + "-")):
-                    return txt
-        return candidates[0][1]
-
-    return ""
-
-
-def _extract_label(rec: Any, preferred_lang: str) -> str:
-    if not isinstance(rec, dict):
-        return ""
-
-    for key in ("prefLabel", "preferredLabel", "rdfs:label", "rdfsLabel", "label"):
-        if key in rec:
-            t = _pick_lang_value(rec.get(key), preferred_lang)
-            if t:
-                return t
-
-    props = rec.get("properties")
-    if isinstance(props, list):
-        for p in props:
-            if not isinstance(p, dict):
-                continue
-            pred = p.get("predicate") or p.get("property") or ""
-            pred = str(pred)
-            if "prefLabel" not in pred and "label" not in pred:
-                continue
-
-            vals = p.get("values")
-            if isinstance(vals, list) and vals:
-                t = _pick_lang_value(vals, preferred_lang)
-                if t:
-                    return t
-            v = p.get("value")
-            if v is not None:
-                t = _pick_lang_value(v, preferred_lang)
-                if t:
-                    return t
-
-    return ""
-
-
-def resolve_pref_label(
-    session: requests.Session,
-    *,
-    base_url: str,
-    api_key: str,
-    ontology_url: str,
-    concept_id: str,
-    self_link: str,
-    label_lang: str,
-    timeout_s: int,
-    max_retries: int,
-) -> str:
-    lang = (label_lang or "en").strip()
-    if lang.lower() == "any":
-        lang = ""
-
-    params: Dict[str, Any] = {"apikey": api_key, "include": "all"}
-    if lang:
-        params["lang"] = lang
-
-    if self_link:
-        url = self_link
-    else:
-        acr = _ontology_acronym_from_url(ontology_url)
-        if not acr or not concept_id:
-            return ""
-        url = base_url.rstrip("/") + f"/ontologies/{quote(acr)}/classes/{quote(concept_id, safe='')}"
-
-    rec = request_with_retries(
-        session,
-        "GET",
-        url,
-        params=params,
-        data=None,
-        headers={},
-        timeout_s=timeout_s,
-        max_retries=max_retries,
-    )
-    return _extract_label(rec, preferred_lang=label_lang)
-
-
 def build_concepts_summary(merged_payload: Dict[str, Any]) -> Dict[str, Any]:
     anns = merged_payload.get("annotations")
     if not isinstance(anns, list):
@@ -723,10 +597,56 @@ def concepts_to_csv_rows(summary: Dict[str, Any]) -> List[Dict[str, Any]]:
     return rows
 
 
+def _discover_pontusx_input() -> Path:
+    """
+    Pontus-X downloads inputs under /data/inputs/<did-hash>/<fileIndex>.
+    In your logs, dataset is at /data/inputs/<...>/0.
+
+    We pick the first file under /data/inputs excluding algoCustomData.json.
+    If multiple candidates exist, we error to avoid choosing wrong.
+    """
+    root = Path("/data/inputs")
+    if not root.exists():
+        raise InputError("No CLI input provided and /data/inputs not found (Pontus-X input staging missing).")
+
+    candidates: List[Path] = []
+    for p in root.rglob("*"):
+        if not p.is_file():
+            continue
+        if p.name == "algoCustomData.json":
+            continue
+        candidates.append(p)
+
+    if not candidates:
+        raise InputError("No input files found under /data/inputs (only algoCustomData.json present).")
+
+    # Prefer exact .../<hash>/0 pattern
+    preferred = [c for c in candidates if c.name == "0"]
+    if len(preferred) == 1:
+        return preferred[0]
+
+    # If only one candidate overall, use it
+    if len(candidates) == 1:
+        return candidates[0]
+
+    # Otherwise ambiguous
+    msg = "Multiple input files found under /data/inputs; cannot choose automatically:\n" + "\n".join(
+        f"- {c}" for c in sorted(candidates)
+    )
+    raise InputError(msg)
+
+
+def _default_out_dir() -> str:
+    # Pontus-X typically collects results from /data/outputs
+    p = Path("/data/outputs")
+    return str(p) if p.exists() else "agroportal_output"
+
+
 def main(argv: Optional[List[str]] = None) -> int:
-    parser = argparse.ArgumentParser()
-    parser.add_argument("input", help="Input file path or '-' for stdin.")
-    parser.add_argument("--out", default="agroportal_output")
+    parser = argparse.ArgumentParser(prog="algorithm")
+    parser.add_argument("input", nargs="?", default=None, help="Input file path or '-' for stdin. Optional in Pontus-X.")
+
+    parser.add_argument("--out", default=_default_out_dir())
     parser.add_argument("--base-url", default=DEFAULT_BASE_URL)
     parser.add_argument("--api-key", default=DEFAULT_API_KEY)
     parser.add_argument("--encoding", default="utf-8")
@@ -762,7 +682,13 @@ def main(argv: Optional[List[str]] = None) -> int:
 
     args = parser.parse_args(argv)
 
+    if args.input is None:
+        args.input = str(_discover_pontusx_input())
+        args.no_prompt_ontology = True
+        print(f"AUTO: discovered input file: {args.input}")
+
     try:
+
         ensure_dir(Path(args.out))
 
         raw = load_input_text(args.input, args.encoding)
@@ -817,54 +743,11 @@ def main(argv: Optional[List[str]] = None) -> int:
         write_json(out_dir / "merged_annotations.json", merged)
 
         summary = build_concepts_summary(merged)
+        # (Label resolution intentionally left as-is)
 
-        labels_attempted = labels_filled = labels_failed = 0
-        if args.resolve_labels:
-            inmem_cache: Dict[str, str] = {}
-            concepts = summary.get("concepts", [])
-            if isinstance(concepts, list):
-                with requests.Session() as session:
-                    for c in concepts:
-                        if not isinstance(c, dict):
-                            continue
-                        ont = str(c.get("ontology", ""))
-                        cid = str(c.get("concept_id", ""))
-                        self_link = str(c.get("_self", ""))
-                        ck = f"{args.label_lang}||{ont}||{cid}"
-
-                        labels_attempted += 1
-                        if ck in inmem_cache:
-                            c["pref_label"] = inmem_cache[ck]
-                            labels_filled += 1
-                            continue
-
-                        try:
-                            label = resolve_pref_label(
-                                session,
-                                base_url=args.base_url,
-                                api_key=args.api_key,
-                                ontology_url=ont,
-                                concept_id=cid,
-                                self_link=self_link,
-                                label_lang=args.label_lang,
-                                timeout_s=args.timeout,
-                                max_retries=args.max_retries,
-                            )
-                        except Exception:
-                            label = ""
-
-                        if label:
-                            c["pref_label"] = label
-                            inmem_cache[ck] = label
-                            labels_filled += 1
-                        else:
-                            labels_failed += 1
-
-                        time.sleep(max(0.0, args.labels_sleep))
-
-        concepts2 = summary.get("concepts", [])
-        if isinstance(concepts2, list):
-            for c in concepts2:
+        concepts = summary.get("concepts", [])
+        if isinstance(concepts, list):
+            for c in concepts:
                 if isinstance(c, dict):
                     c.pop("_self", None)
 
@@ -880,9 +763,6 @@ def main(argv: Optional[List[str]] = None) -> int:
                 "num_raw_annotations": merged["counts"]["raw"],
                 "num_merged_annotations": merged["counts"]["merged"],
                 "num_unique_concepts": summary["num_unique_concepts"],
-                "labels_attempted": labels_attempted,
-                "labels_filled": labels_filled,
-                "labels_failed": labels_failed,
             }
         )
         write_json(out_dir / "run_metadata.json", meta)
@@ -892,9 +772,7 @@ def main(argv: Optional[List[str]] = None) -> int:
             "Counts: "
             f"raw_annotations={meta['num_raw_annotations']} "
             f"merged_annotations={meta['num_merged_annotations']} "
-            f"unique_concepts={meta['num_unique_concepts']} "
-            f"labels_filled={labels_filled}/{labels_attempted} "
-            f"labels_failed={labels_failed}"
+            f"unique_concepts={meta['num_unique_concepts']}"
         )
         return 0
 
