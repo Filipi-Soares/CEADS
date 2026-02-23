@@ -1,0 +1,524 @@
+{
+  "@context": {
+    "adms": "http://www.w3.org/ns/adms#",
+    "dcat": "http://www.w3.org/ns/dcat#",
+    "dct": "http://purl.org/dc/terms/",
+    "eli": "http://data.europa.eu/eli/ontology#",
+    "foaf": "http://xmlns.com/foaf/0.1/",
+    "locn": "http://www.w3.org/ns/locn#",
+    "r5r": "http://data.europa.eu/r5r/",
+    "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
+    "owl": "http://www.w3.org/2002/07/owl#",
+    "skos": "http://www.w3.org/2004/02/skos/core#",
+    "spdx": "http://spdx.org/rdf/terms#",
+    "vcard": "http://www.w3.org/2006/vcard/ns#",
+    "xsd": "http://www.w3.org/2001/XMLSchema#",
+    "dcat:accessURL":   { "@type": "@id" },
+    "dcat:downloadURL": { "@type": "@id" },
+    "dcat:endpointURL": { "@type": "@id" },
+    "dcat:landingPage": { "@type": "@id" },
+    "foaf:homepage":    { "@type": "@id" },
+    "foaf:page":        { "@type": "@id" },
+    "rdfs:seeAlso":     { "@type": "@id" }
+  },
+  "@graph": [
+    {
+      "@id": "https://doi.org/10.57745/UZ2NJ7",
+      "@type": "dcat:Dataset",
+      "dct:title": {
+        "@language": "fr",
+        "@value": "Duplication des données : Carte d’occupation des sols du CES OSO – THEIA (2016-2023, France métropolitaine)"
+      },
+      "dct:description": [
+        {
+          "@language": "fr",
+          "@value": "<a href=\"https://artificialisation.developpement-durable.gouv.fr/bases-donnees/oso-theia\"><b>Description officielle des données</b></a><br>\n<a href=\"https://geodes-portal.cnes.fr/search?dataType=OSO&startDate=2010-01-01T20:27&endpointURL=raster&box=-20037508.342789244,-9963094.425997986,20037508.342789244,9963094.425997986\"><b>Portail officiel de téléchargement</b></a>\n\n<hr>\n\n<b>Raison du dépôt</b><br>\nEn raison de la trouvabilité et de l’accessibilité technique limitées des données, ce dépôt regroupe l’ensemble des données raster de l’occupation du sol (OSO) téléchargeables sur la plateforme GEODES du CNES.<br><br>\n\n<b>Point sur les licences</b><br>\nLes données originales sont diffusées sous la licence <a href=\"https://opendatacommons.org/licenses/odbl/summary/\">ODbL 1.0</a> selon le <a href=\"https://artificialisation.developpement-durable.gouv.fr/bases-donnees/oso-theia\">gouvernement français</a>. ...\n\n<b>API</b><br>\nL'accès à une API de découpe selon un polygone des cartes d'occupation du sol est disponible sur demande.<br><br>\n\n<b>Proposition de citation</b><br>\n<blockquote>\nOSO – THEIA ... Redistribution (non officielle) : https://doi.org/10.57745/UZ2NJ7\n</blockquote>"
+        }
+      ],
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "dct:modified": {
+        "@type": "xsd:dateTime",
+        "@value": "2026-02-18T22:23:49Z"
+      },
+      "dct:language": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/language/FRA"
+        }
+      ],
+      "dcat:keyword": [
+        {
+          "@language": "en",
+          "@value": "land occupation"
+        },
+        {
+          "@language": "fr",
+          "@value": "données satellitaires"
+        },
+        {
+          "@language": "fr",
+          "@value": "surface continentale"
+        }
+      ],
+      "dcat:theme": [
+        {
+          "@id": "http://aims.fao.org/aos/agrovoc/c_03e78242",
+          "@type": "skos:Concept",
+          "skos:prefLabel": {
+            "@language": "en",
+            "@value": "land take"
+          }
+        },
+        {
+          "@id": "http://opendata.inrae.fr/thesaurusINRAE/c_16839",
+          "@type": "skos:Concept",
+          "skos:prefLabel": {
+            "@language": "fr",
+            "@value": "satellite image"
+          }
+        },
+        {
+          "@id": "http://sweetontology.net/realmLandform/LandSurface",
+          "@type": "owl:Class",
+          "skos:prefLabel": {
+            "@language": "en",
+            "@value": "land surface"
+          }
+        }
+      ],
+      "dct:spatial": [
+        {
+          "@id": "http://publications.europa.eu/resource/authority/country/FRA"
+        },
+        {
+          "@type": "dct:Location",
+          "dct:title": {
+            "@language": "fr",
+            "@value": "France métropolitaine"
+          }
+        }
+      ],
+      "dct:temporal": [
+        {
+          "@type": "dct:PeriodOfTime",
+          "dcat:startDate": {
+            "@type": "xsd:date",
+            "@value": "2023-12-31"
+          },
+          "dcat:endDate": {
+            "@type": "xsd:date",
+            "@value": "2016-01-01"
+          }
+        }
+      ],
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "dct:publisher": {
+        "@id": "https://www.wikidata.org/wiki/Q131564922",
+        "@type": "foaf:Agent",
+        "foaf:name": "Recherche Data Gouv",
+        "foaf:homepage": {
+          "@id": "https://recherche.data.gouv.fr/fr"
+        }
+      },
+      "dcat:contactPoint": {
+        "@id": "https://hybv.riverly.inrae.fr/equipe/membres-permanents/heraut-louis",
+        "@type": "vcard:Kind",
+        "vcard:fn": "Héraut, Louis",
+        "vcard:organization-name": "INRAE, UR RiverLy, Villeurbanne, France",
+        "vcard:hasEmail": {
+          "@id": "mailto:louis.heraut@inrae.fr"
+        }
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ],
+      "r5r:hvdCategory": [
+        {
+          "@id": "http://data.europa.eu/bna/c_b21e1296"
+        }
+      ],
+      "dcat:distribution": [
+        {
+          "@id": "https://doi.org/10.57745/JVDGLR"
+        },
+        {
+          "@id": "https://doi.org/10.57745/0EXLS9"
+        },
+        {
+          "@id": "https://doi.org/10.57745/D2UG3H"
+        },
+        {
+          "@id": "https://doi.org/10.57745/7PZJTN"
+        },
+        {
+          "@id": "https://doi.org/10.57745/8KTQGI"
+        },
+        {
+          "@id": "https://doi.org/10.57745/D9XAMR"
+        },
+        {
+          "@id": "https://doi.org/10.57745/H40MFH"
+        },
+        {
+          "@id": "https://doi.org/10.57745/8M1AN1"
+        }
+      ],
+      "dcat:service": [
+        {
+          "@id": "https://geodes-portal.cnes.fr/api/stac"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/JVDGLR",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/JVDGLR",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/JVDGLR"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5397400509,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "69d56369fc7d80d783f3194513ca47e8"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/0EXLS9",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/0EXLS9",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/0EXLS9"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5664372857,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "50d9ba72fb403065b2c7aeb9624a4e58"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/D2UG3H",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/D2UG3H",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/D2UG3H"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5316437362,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "eb4e69eefcac62060c85660c02d8c83e"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/7PZJTN",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/7PZJTN",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/7PZJTN"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5281768040,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "84e4505d7bd852a18633049c2598c98b"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/8KTQGI",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/8KTQGI",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/8KTQGI"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5043169226,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "421c1a0c471a933a54a3de4c148c61c4"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/D9XAMR",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/D9XAMR",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/D9XAMR"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5272871138,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "afd9b4f81089144a9636d635dee012ef"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/H40MFH",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/H40MFH",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/H40MFH"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5416529819,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "aa3d9b53410bb4e369df53408b5e9ad8"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://doi.org/10.57745/8M1AN1",
+      "@type": "dcat:Distribution",
+      "dcat:accessURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/file.xhtml?persistentId=doi:10.57745/8M1AN1",
+        "@type": "rdfs:Resource"
+      },
+      "dcat:downloadURL": {
+        "@id": "https://entrepot.recherche.data.gouv.fr/api/access/datafile/:persistentId?persistentId=doi:10.57745/8M1AN1"
+      },
+      "dcat:mediaType": "application/gzip",
+      "dcat:byteSize": 5624505462,
+      "dct:issued": {
+        "@type": "xsd:date",
+        "@value": "2025-09-12"
+      },
+      "spdx:checksum": {
+        "@type": "spdx:Checksum",
+        "spdx:algorithm": {
+          "@id": "spdx:checksumAlgorithm_md5"
+        },
+        "spdx:checksumValue": "bc6deea29081876a9be88c76b92d59ec"
+      },
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ]
+    },
+    {
+      "@id": "https://geodes-portal.cnes.fr/api/stac",
+      "@type": [
+        "dcat:DataService",
+        "rdfs:Resource"
+      ],
+      "dcat:servesDataset": [
+        {
+          "@id": "https://doi.org/10.57745/UZ2NJ7"
+        }
+      ],
+      "dct:title": {
+        "@language": "fr",
+        "@value": "API STAC GEODES (CNES)"
+      },
+      "dcat:contactPoint": {
+        "@id": "https://geodes.cnes.fr/support/contact-support/",
+        "@type": "vcard:Kind",
+        "vcard:fn": "GEODES (CNES) Contact & Request",
+        "vcard:organization-name": "CNES / GEODES",
+        "vcard:hasURL": {
+          "@id": "https://geodes.cnes.fr/support/api/"
+        }
+      },
+      "dcat:endpointURL": {
+        "@id": "https://geodes-portal.cnes.fr/api/stac"
+      },
+      "dcat:endpointDescription": {
+        "@id": "https://catalogue.dataspace.copernicus.eu/stac/api"
+      },
+      "dcat:landingPage": {
+        "@id": "https://geodes-portal.cnes.fr/search?dataType=OSO&startDate=2010-01-01T20:27&endpointURL=raster&box=-20037508.342789244,-9747412.912586017,20037508.342789244,9747412.912586017"
+      },
+      "foaf:page": {
+        "@id": "https://geodes.cnes.fr/support/api/"
+      },
+      "r5r:applicableLegislation": [
+        {
+          "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj"
+        }
+      ],
+      "r5r:hvdCategory": [
+        {
+          "@id": "http://data.europa.eu/bna/c_b21e1296"
+        }
+      ],
+      "dct:license": {
+        "@id": "https://spdx.org/licenses/etalab-2.0.html"
+      }
+    },
+    {
+      "@id": "https://spdx.org/licenses/etalab-2.0.html",
+      "@type": "dct:LicenseDocument",
+      "rdfs:seeAlso": {
+        "@id": "https://spdx.org/licenses/etalab-2.0"
+      }
+    },
+    {
+      "@id": "http://data.europa.eu/eli/reg_impl/2023/138/oj",
+      "@type": "eli:LegalResource"
+    },
+    {
+      "@id": "http://data.europa.eu/bna/c_b21e1296",
+      "@type": "skos:Concept"
+    },
+    {
+      "@id": "https://geodes-portal.cnes.fr/search?dataType=OSO&startDate=2010-01-01T20:27&endpointURL=raster&box=-20037508.342789244,-9747412.912586017,20037508.342789244,9747412.912586017",
+      "@type": "foaf:Document"
+    },
+    {
+      "@id": "mailto:louis.heraut@inrae.fr",
+      "@type": "rdfs:Resource"
+    },
+    {
+      "@id": "https://catalogue.dataspace.copernicus.eu/stac/api",
+      "@type": "rdfs:Resource"
+    },
+    {
+      "@id": "https://geodes.cnes.fr/support/contact-support/",
+      "@type": "rdfs:Resource"
+    },
+    {
+      "@id": "https://geodes.cnes.fr/support/api/",
+      "@type": "rdfs:Resource"
+    },
+    {
+      "@id": "https://geodes.cnes.fr/support/api/",
+      "@type": "foaf:Document"
+    }
+  ]
+}
