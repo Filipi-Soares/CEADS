@@ -575,11 +575,7 @@
     },
     {
       "@id": "https://geodes.cnes.fr/support/api/",
-      "@type": "rdfs:Resource"
-    },
-    {
-      "@id": "https://geodes.cnes.fr/support/api/",
-      "@type": "foaf:Document"
+      "@type": ["rdfs:Resource", "foaf:Document"]
     },
     {
       "@id": "http://publications.europa.eu/resource/authority/language/FRA",
