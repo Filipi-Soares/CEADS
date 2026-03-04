@@ -8,7 +8,6 @@
     "locn": "http://www.w3.org/ns/locn#",
     "r5r": "http://data.europa.eu/r5r/",
     "rdfs": "http://www.w3.org/2000/01/rdf-schema#",
-    "owl": "http://www.w3.org/2002/07/owl#",
     "skos": "http://www.w3.org/2004/02/skos/core#",
     "spdx": "http://spdx.org/rdf/terms#",
     "vcard": "http://www.w3.org/2006/vcard/ns#",
@@ -77,14 +76,6 @@
           "skos:prefLabel": {
             "@language": "fr",
             "@value": "satellite image"
-          }
-        },
-        {
-          "@id": "http://sweetontology.net/realmLandform/LandSurface",
-          "@type": ["owl:Class", "skos:Concept"],
-          "skos:prefLabel": {
-            "@language": "en",
-            "@value": "land surface"
           }
         }
       ],
